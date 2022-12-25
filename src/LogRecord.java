@@ -109,4 +109,26 @@ public class LogRecord {
     public String getUserAgent() {
         return userAgent;
     }
+
+    public String getShortUserAgent() {
+        String[] parts = userAgent.split(";");
+        String fragment="";
+        if (parts.length >= 2) {
+            fragment = parts[1];
+        }
+        if (fragment!=null) {
+            int i = fragment.indexOf('/');
+            if (i > 0)
+                fragment = fragment.substring(0, i);
+        }
+        return fragment.trim();
+    }
+
+    public boolean isYandexBot(){
+        return "YandexBot".toLowerCase().equals(getShortUserAgent().toLowerCase());
+    }
+    public boolean isGoogleBot(){
+        return "GoogleBot".toLowerCase().equals(getShortUserAgent().toLowerCase());
+    }
+
 }
