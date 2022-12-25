@@ -51,57 +51,46 @@ public class LogRecord {
         int i;
         i=str.indexOf(' ');
         logRecord.addres=str.substring(0,i);
-//        System.out.println(logRecord.addres);
         i++;
         str=str.substring(i);
-//        System.out.println(str);
 
         i=str.indexOf(' ');
         logRecord.dummy1=str.substring(0,i);
-//        System.out.println(logRecord.dummy1);
         i++;
         str=str.substring(i);
 
         i=str.indexOf(' ');
         logRecord.dummy2=str.substring(0,i);
-//        System.out.println(logRecord.dummy2);
         i++;
         str=str.substring(i);
 
         i=str.indexOf(']');
         logRecord.dateRec=str.substring(0,i+1);
-//        System.out.println(logRecord.dateRec);
         i+=3;
         str=str.substring(i);
 
         i=str.indexOf('\"');
         logRecord.method=str.substring(0,i);
-//        System.out.println(logRecord.method);
         i+=2;
         str=str.substring(i);
 
         i=str.indexOf(' ');
         logRecord.responseCode=str.substring(0,i);
-//        System.out.println(logRecord.responseCode);
         i++;
         str=str.substring(i);
 
         i=str.indexOf(' ');
         logRecord.responseSize=str.substring(0,i);
-//        System.out.println(logRecord.responseSize);
         i+=2;
         str=str.substring(i);
 
         i=str.indexOf('\"');
         logRecord.referer=str.substring(0,i);
-//        System.out.println(logRecord.referer);
         i+=3;
         str=str.substring(i);
-//        System.out.println(str);
 
         i=str.indexOf('\"');
         logRecord.userAgent=str.substring(0,i-1);
-//        System.out.println(logRecord.userAgent);
 
         return logRecord;
     }
@@ -110,7 +99,7 @@ public class LogRecord {
         return userAgent;
     }
 
-    public String getShortUserAgent() {
+    private String getShortUserAgent() {
         String[] parts = userAgent.split(";");
         String fragment="";
         if (parts.length >= 2) {
