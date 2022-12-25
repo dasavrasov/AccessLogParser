@@ -1,8 +1,30 @@
 import java.io.*;
-import java.util.Scanner;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
+import java.util.Locale;
 
 public class Main {
     public static void main(String[] args) {
+//        String strDate="25/Sep/2022:06:45:11 +0300";
+//        String strDate="25/Sep/2022:06:45:11";
+//        String strDate="[25/Sep/2022]";
+//        strDate = strDate.substring(1,strDate.length()-1);
+//        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z").withLocale(Locale.ENGLISH);
+//        strDate=LocalDateTime.now().format(dtf);
+
+//        DateTimeFormatter dtf1=new DateTimeFormatterBuilder().parseCaseInsensitive()
+//                .appendPattern("dd/MMM/yyyy")
+//                .toFormatter().withLocale(Locale.ENGLISH);
+
+//        LocalDateTime dateTime=LocalDateTime.parse(strDate,dtf);
+//        System.out.println(strDate);
+//
+
+//        System.out.println(dateTime);
+
+//        LocalDateTime dateTime=
         File path=new File("access.log");
         int numberOfLines=0;
         int yandexBots=0;
@@ -19,11 +41,14 @@ public class Main {
                 if (length>1024)
                     throw new TooLongStringException("в файле встретилась строка длиннее 1024 символов");
                 numberOfLines++;
-                LogRecord logRecord=LogRecord.of(line);
+                LogEntry logRecord= new LogEntry(line);
+                System.out.println(logRecord);
                 if (logRecord.isYandexBot())
                     yandexBots++;
                 if (logRecord.isGoogleBot())
                     googleBots++;
+//                if (numberOfLines>25)
+//                    System.exit(0);
             }
             System.out.println("yandexBots "+yandexBots);
             System.out.println("googleBots "+googleBots);

@@ -1,42 +1,33 @@
-public class LogRecord {
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
+
+public class LogEntry {
+    private static final DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z").withLocale(Locale.ENGLISH);
     private String addres; // IP-адрес клиента, который сделал запрос к серверу (в примере выше — 37.231.123.209).
 
     private String dummy1; // Два пропущенных свойства, на месте которых обычно стоят дефисы, но могут встречаться также и пустые строки ("").
 
     private String dummy2;
 
-    private String dateRec; // Дата и время запроса в квадратных скобках.
+    private LocalDateTime dateRec; // Дата и время запроса в квадратных скобках.
 
-    private String method; // Метод запроса (в примере выше — GET) и путь, по которому сделан запрос.
+    private HttpMethod method; // Метод запроса (в примере выше — GET) и путь, по которому сделан запрос.
 
-    private String responseCode; // Код HTTP-ответа (в примере выше — 200).
+    private int responseCode; // Код HTTP-ответа (в примере выше — 200).
 
-    private String responseSize; // Размер отданных данных в байтах (в примере выше — 61096).
+    private int responseSize; // Размер отданных данных в байтах (в примере выше — 61096).
 
     private String referer; // Путь к странице, с которой перешли на текущую страницу, — referer (в примере выше — “https://nova-news.ru/search/?rss=1&lg=1”).
 
     private String userAgent; // User-Agent — информация о браузере или другом клиенте, который выполнил запрос.
 
-    private LogRecord() {
-    }
-
-    private LogRecord(String addres, String dummy1, String dummy2, String dateRec, String method, String responseCode, String responseSize, String referer, String userAgent) {
-        this.addres = addres;
-        this.dummy1 = dummy1;
-        this.dummy2 = dummy2;
-        this.dateRec = dateRec;
-        this.method = method;
-        this.responseCode = responseCode;
-        this.responseSize = responseSize;
-        this.referer = referer;
-        this.userAgent = userAgent;
+    private LogEntry() {
     }
 
     @Override
     public String toString() {
         return addres + " " +
-                dummy1 + " " +
-                dummy2 + " " +
                 dateRec +" " +
                 "\""+method +"\"" + " " +
                 responseCode + " " +
@@ -45,54 +36,71 @@ public class LogRecord {
                 "\""+userAgent+"\"";
     }
 
-    public static LogRecord of(String str){
-        LogRecord logRecord=new LogRecord();
-        String str1;
+    public LogEntry(String str){
         int i;
         i=str.indexOf(' ');
-        logRecord.addres=str.substring(0,i);
+        this.addres=str.substring(0,i);
         i++;
         str=str.substring(i);
 
         i=str.indexOf(' ');
-        logRecord.dummy1=str.substring(0,i);
+        this.dummy1=str.substring(0,i);
         i++;
         str=str.substring(i);
 
         i=str.indexOf(' ');
-        logRecord.dummy2=str.substring(0,i);
+        this.dummy2=str.substring(0,i);
         i++;
         str=str.substring(i);
 
         i=str.indexOf(']');
-        logRecord.dateRec=str.substring(0,i+1);
+        String strDate=str.substring(0,i+1); //дата в квадратных скобках []
+        strDate = strDate.substring(1,strDate.length()-1);//убираем []
+        try {
+            this.dateRec=LocalDateTime.parse(strDate,dtf); //парсим дату
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка парсинга даты запроса "+strDate);
+        }
         i+=3;
         str=str.substring(i);
 
         i=str.indexOf('\"');
-        logRecord.method=str.substring(0,i);
+        this.method=GetHttpMethod(str.substring(0,i));
         i+=2;
         str=str.substring(i);
 
         i=str.indexOf(' ');
-        logRecord.responseCode=str.substring(0,i);
+        try {
+            this.responseCode=Integer.parseInt(str.substring(0,i));
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         i++;
         str=str.substring(i);
 
         i=str.indexOf(' ');
-        logRecord.responseSize=str.substring(0,i);
+        try {
+            this.responseSize=Integer.parseInt(str.substring(0,i));
+        } catch (NumberFormatException e) {
+            throw new RuntimeException(e);
+        }
         i+=2;
         str=str.substring(i);
 
         i=str.indexOf('\"');
-        logRecord.referer=str.substring(0,i);
+        this.referer=str.substring(0,i);
         i+=3;
         str=str.substring(i);
 
         i=str.indexOf('\"');
-        logRecord.userAgent=str.substring(0,i-1);
+        this.userAgent=str.substring(0,i-1);
+    }
 
-        return logRecord;
+    private HttpMethod GetHttpMethod(String str) {
+        int i=0;
+        i=str.indexOf(' ');
+        String s_meth=str.substring(0,i).trim();
+        return HttpMethod.valueOf(s_meth);
     }
 
     public String getUserAgent() {
@@ -116,8 +124,32 @@ public class LogRecord {
     public boolean isYandexBot(){
         return "YandexBot".toLowerCase().equals(getShortUserAgent().toLowerCase());
     }
+
     public boolean isGoogleBot(){
         return "GoogleBot".toLowerCase().equals(getShortUserAgent().toLowerCase());
     }
 
+    public String getAddres() {
+        return addres;
+    }
+
+    public LocalDateTime getDateRec() {
+        return dateRec;
+    }
+
+    public HttpMethod getMethod() {
+        return method;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
+    }
+
+    public int getResponseSize() {
+        return responseSize;
+    }
+
+    public String getReferer() {
+        return referer;
+    }
 }
