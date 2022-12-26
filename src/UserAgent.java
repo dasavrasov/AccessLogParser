@@ -1,9 +1,17 @@
 public class UserAgent {
-    private String sysInfo;
-    private String browser;
+    private final SysInfo sys;
+    private final BrowserInfo browser;
+
+    public SysInfo getSys() {
+        return sys;
+    }
+
+    public BrowserInfo getBrowser() {
+        return browser;
+    }
 
     public UserAgent(String str) {
-        this.sysInfo="Windows";
-        this.browser="Chrome";
+       this.sys=SysInfo.checkSys(str);
+        this.browser=BrowserInfo.checkBrowser(str);
     }
 }

@@ -1,5 +1,5 @@
 import java.io.*;
-import java.time.LocalDateTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
@@ -7,28 +7,16 @@ import java.util.Locale;
 
 public class Main {
     public static void main(String[] args) {
-//        String strDate="25/Sep/2022:06:45:11 +0300";
-//        String strDate="25/Sep/2022:06:45:11";
-//        String strDate="[25/Sep/2022]";
-//        strDate = strDate.substring(1,strDate.length()-1);
-//        DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z").withLocale(Locale.ENGLISH);
-//        strDate=LocalDateTime.now().format(dtf);
+        LocalTime start=LocalTime.of(06,0);
+        LocalTime end=LocalTime.of(07,1);
+        calculteStats(start,end);
+    }
 
-//        DateTimeFormatter dtf1=new DateTimeFormatterBuilder().parseCaseInsensitive()
-//                .appendPattern("dd/MMM/yyyy")
-//                .toFormatter().withLocale(Locale.ENGLISH);
-
-//        LocalDateTime dateTime=LocalDateTime.parse(strDate,dtf);
-//        System.out.println(strDate);
-//
-
-//        System.out.println(dateTime);
-
-//        LocalDateTime dateTime=
+    static void calculteStats(LocalTime start, LocalTime end){
         File path=new File("access.log");
         int numberOfLines=0;
-        int yandexBots=0;
-        int googleBots=0;
+
+        Statistics stats=new Statistics();
 
         FileReader fileReader = null;
         try {
@@ -42,24 +30,19 @@ public class Main {
                     throw new TooLongStringException("в файле встретилась строка длиннее 1024 символов");
                 numberOfLines++;
                 LogEntry logRecord= new LogEntry(line);
-                System.out.println(logRecord);
-                if (logRecord.isYandexBot())
-                    yandexBots++;
-                if (logRecord.isGoogleBot())
-                    googleBots++;
-//                if (numberOfLines>25)
-//                    System.exit(0);
+
+                if (logRecord.getDateRec().toLocalTime().compareTo(start)>0 &&
+                        logRecord.getDateRec().toLocalTime().compareTo(end)<0)
+                    stats.addEntry(logRecord);
             }
-            System.out.println("yandexBots "+yandexBots);
-            System.out.println("googleBots "+googleBots);
-            System.out.println("googleBots "+numberOfLines);
-            System.out.println("общее количество строк в файле: "+numberOfLines);
+            System.out.println("Общее количество строк в файле: "+numberOfLines);
+            System.out.println("Общий трафик за заданный период "+stats.getTotalTraffic());
+            System.out.println("Миним время "+stats.getMinTime());
+            System.out.println("Макс время "+stats.getMaxTime());
+            System.out.println("Разница в часах "+ Duration.between(stats.getMinTime(),stats.getMaxTime()).toHours());
 
-            double yb=(double)yandexBots/(double)numberOfLines;
-            double gb=(double)googleBots/(double)numberOfLines;
+            System.out.println(String.format("Средний объем часового трафика %f",stats.getTrafficRate()));
 
-            System.out.println("доля запросов от YandexBot в файле: "+yb);
-            System.out.println("доля запросов от GoogleBot в файле: "+gb);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e1) {

@@ -4,26 +4,24 @@ import java.util.Locale;
 
 public class LogEntry {
     private static final DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z").withLocale(Locale.ENGLISH);
-    private String addres; // IP-адрес клиента, который сделал запрос к серверу (в примере выше — 37.231.123.209).
 
-    private String dummy1; // Два пропущенных свойства, на месте которых обычно стоят дефисы, но могут встречаться также и пустые строки ("").
+    private final String addres; // IP-адрес клиента, который сделал запрос к серверу (в примере выше — 37.231.123.209).
 
-    private String dummy2;
+    private final String dummy1; // Два пропущенных свойства, на месте которых обычно стоят дефисы, но могут встречаться также и пустые строки ("").
 
-    private LocalDateTime dateRec; // Дата и время запроса в квадратных скобках.
+    private final String dummy2;
 
-    private HttpMethod method; // Метод запроса (в примере выше — GET) и путь, по которому сделан запрос.
+    private final LocalDateTime dateRec; // Дата и время запроса в квадратных скобках.
 
-    private int responseCode; // Код HTTP-ответа (в примере выше — 200).
+    private final HttpMethod method; // Метод запроса (в примере выше — GET) и путь, по которому сделан запрос.
 
-    private int responseSize; // Размер отданных данных в байтах (в примере выше — 61096).
+    private final int responseCode; // Код HTTP-ответа (в примере выше — 200).
 
-    private String referer; // Путь к странице, с которой перешли на текущую страницу, — referer (в примере выше — “https://nova-news.ru/search/?rss=1&lg=1”).
+    private final int responseSize; // Размер отданных данных в байтах (в примере выше — 61096).
 
-    private String userAgent; // User-Agent — информация о браузере или другом клиенте, который выполнил запрос.
+    private final String referer; // Путь к странице, с которой перешли на текущую страницу, — referer (в примере выше — “https://nova-news.ru/search/?rss=1&lg=1”).
 
-    private LogEntry() {
-    }
+    private final UserAgent userAgent; // User-Agent — информация о браузере или другом клиенте, который выполнил запрос.
 
     @Override
     public String toString() {
@@ -33,7 +31,8 @@ public class LogEntry {
                 responseCode + " " +
                 responseSize + " " +
                 "\""+referer  +"\"" + " " +
-                "\""+userAgent+"\"";
+                userAgent.getSys()+" " +
+                userAgent.getBrowser();
     }
 
     public LogEntry(String str){
@@ -93,7 +92,7 @@ public class LogEntry {
         str=str.substring(i);
 
         i=str.indexOf('\"');
-        this.userAgent=str.substring(0,i-1);
+        this.userAgent=new UserAgent(str.substring(0,i-1));
     }
 
     private HttpMethod GetHttpMethod(String str) {
@@ -103,30 +102,8 @@ public class LogEntry {
         return HttpMethod.valueOf(s_meth);
     }
 
-    public String getUserAgent() {
+    public UserAgent getUserAgent() {
         return userAgent;
-    }
-
-    private String getShortUserAgent() {
-        String[] parts = userAgent.split(";");
-        String fragment="";
-        if (parts.length >= 2) {
-            fragment = parts[1];
-        }
-        if (fragment!=null) {
-            int i = fragment.indexOf('/');
-            if (i > 0)
-                fragment = fragment.substring(0, i);
-        }
-        return fragment.trim();
-    }
-
-    public boolean isYandexBot(){
-        return "YandexBot".toLowerCase().equals(getShortUserAgent().toLowerCase());
-    }
-
-    public boolean isGoogleBot(){
-        return "GoogleBot".toLowerCase().equals(getShortUserAgent().toLowerCase());
     }
 
     public String getAddres() {
