@@ -104,7 +104,7 @@ public class Statistics {
         }
        return res;
     }
-    //возвращает статистику операционных систем пользователей сайта
+    //возвращает статистику браузеров сайта
     public HashMap<String, Double> getBrowserParts(){
         double total=0;
         double cnt=0;
