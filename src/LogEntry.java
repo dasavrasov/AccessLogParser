@@ -5,7 +5,7 @@ import java.util.Locale;
 public class LogEntry {
     private static final DateTimeFormatter dtf=DateTimeFormatter.ofPattern("dd/MMM/yyyy:HH:mm:ss Z").withLocale(Locale.ENGLISH);
 
-    private final String addres; // IP-адрес клиента, который сделал запрос к серверу (в примере выше — 37.231.123.209).
+    private final String address; // IP-адрес клиента, который сделал запрос к серверу (в примере выше — 37.231.123.209).
 
     private final String dummy1; // Два пропущенных свойства, на месте которых обычно стоят дефисы, но могут встречаться также и пустые строки ("").
 
@@ -25,7 +25,7 @@ public class LogEntry {
 
     @Override
     public String toString() {
-        return addres + " " +
+        return address + " " +
                 dateRec +" " +
                 "\""+method +"\"" + " " +
                 responseCode + " " +
@@ -38,7 +38,7 @@ public class LogEntry {
     public LogEntry(String str){
         int i;
         i=str.indexOf(' ');
-        this.addres=str.substring(0,i);
+        this.address =str.substring(0,i);
         i++;
         str=str.substring(i);
 
@@ -106,8 +106,8 @@ public class LogEntry {
         return userAgent;
     }
 
-    public String getAddres() {
-        return addres;
+    public String getAddress() {
+        return address;
     }
 
     public LocalDateTime getDateRec() {

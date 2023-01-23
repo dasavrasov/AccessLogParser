@@ -7,10 +7,10 @@ public enum SysInfo {
                 str.contains("win64") ||
                 str.contains("x64"))
             return WINDOWS;
-        else if (str.contains("linux") ||
-                str.contains("ubuntu"))
+        else if ((str.contains("linux") ||
+                str.contains("ubuntu")) && !str.contains("android"))
             return LINUX;
-        else if (str.contains("macos"))
+        else if (str.contains("mac os"))
             return MACOS;
         else if (str.contains("android"))
             return ANDRIOD;

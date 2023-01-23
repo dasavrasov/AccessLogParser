@@ -43,6 +43,9 @@ public class Main {
 
             System.out.println(String.format("Средний объем часового трафика %f",stats.getTrafficRate()));
 
+            System.out.println("Cтатистика операционных систем:\n"+stats.getOpsysStats());
+            System.out.println("Доля операционных систем:\n"+stats.getOsStats());
+
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e1) {
