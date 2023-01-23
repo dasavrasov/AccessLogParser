@@ -1,9 +1,5 @@
 import java.io.*;
 import java.time.*;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.format.FormatStyle;
-import java.util.Locale;
 
 public class Main {
     public static void main(String[] args) {
@@ -44,7 +40,10 @@ public class Main {
             System.out.println(String.format("Средний объем часового трафика %f",stats.getTrafficRate()));
 
             System.out.println("Cтатистика операционных систем:\n"+stats.getOpsysStats());
-            System.out.println("Доля операционных систем:\n"+stats.getOsStats());
+            System.out.println("Доля операционных систем:\n"+stats.getOsParts());
+
+            System.out.println("Cтатистика браузеров:\n"+stats.getBrowserStats());
+            System.out.println("Доля браузеров:\n"+stats.getBrowserParts());
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
