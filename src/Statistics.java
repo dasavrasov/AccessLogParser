@@ -1,15 +1,17 @@
 import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class Statistics {
     private long totalTraffic=0;
-    private LocalTime minTime=LocalTime.of(23,59,59);
+    private LocalDateTime minTime=LocalDateTime.MAX;
 
-    private LocalTime maxTime=LocalTime.of(0,0,0);
+    private LocalDateTime maxTime=LocalDateTime.MIN;
 
-
+    public long getHours(){
+        return Duration.between(minTime,maxTime).toHours();
+    }
     private HashSet<String> existingPages =new HashSet<>(); //список существующих страниц
 
     private HashSet<String> nonExistingPages =new HashSet<>(); //список несуществующих страниц
@@ -17,6 +19,8 @@ public class Statistics {
     private HashMap<String, Integer> opsysStats=new HashMap<>();
 
     private HashMap<String, Integer> browserStats=new HashMap<>();
+
+    private List<LogEntry> lines=new ArrayList<>(); //все строки файла
 
     public HashMap<String, Integer> getOpsysStats() {
         return opsysStats;
@@ -30,11 +34,14 @@ public class Statistics {
         SysInfo sysInfo;
         BrowserInfo browserInfo;
         int responseCode=0;
+
+        lines.add(logEntry);
+
         totalTraffic+=logEntry.getResponseSize();
-        if (logEntry.getDateRec().toLocalTime().compareTo(minTime)<0)
-            minTime=logEntry.getDateRec().toLocalTime();
-        if (logEntry.getDateRec().toLocalTime().compareTo(maxTime)>0)
-            maxTime=logEntry.getDateRec().toLocalTime();
+        if (logEntry.getDateRec().compareTo(minTime)<0)
+            minTime=logEntry.getDateRec();
+        if (logEntry.getDateRec().compareTo(maxTime)>0)
+            maxTime=logEntry.getDateRec();
         responseCode=logEntry.getResponseCode();
         if (responseCode==200)
             existingPages.add(logEntry.getAddress());
@@ -69,11 +76,11 @@ public class Statistics {
         return totalTraffic;
     }
 
-    public LocalTime getMinTime() {
+    public LocalDateTime getMinTime() {
         return minTime;
     }
 
-    public LocalTime getMaxTime() {
+    public LocalDateTime getMaxTime() {
         return maxTime;
     }
 
@@ -121,4 +128,29 @@ public class Statistics {
         }
        return res;
     }
+
+    // Метод подсчёта среднего количества посещений сайта за час
+    //Разделите период времени в часах, за который имеются записи в логе, на количество посещений пользователей
+    public double averageNumberVisits(){
+        double visits=lines.stream().filter(rec->!rec.getUserAgent().isBot()).count();
+        double hours=getHours();
+        return hours/visits;
+    }
+
+    //Метод подсчёта среднего количества ошибочных запросов в час
+    //Разделите период времени в часах, за который имеются записи в логе, на количество запросов, по которым был ошибочный код ответа (4xx или 5xx)
+    public double avarageNumberOfBadRequests(){
+        double badRequests=lines.stream().filter(rec-> rec.getResponseCode()>=400 && rec.getResponseCode()<600).count();
+        double hours=getHours();
+        return hours/badRequests;
+    }
+
+    // Метод расчёта средней посещаемости одним пользователем
+    //разделить общее количество посещений реальными пользователями (не ботами) на число уникальных IP-адресов таких пользователей
+    public double averageUserActivity(){
+        double visits=lines.stream().filter(rec->!rec.getUserAgent().isBot()).count(); //общее количество посещений реальными пользователями (не ботами)
+        double numberUniqIp=lines.stream().map(rec->rec.getAddress()).distinct().count(); //число уникальных IP-адресов таких пользователей
+        return visits/numberUniqIp;
+    }
+
 }
