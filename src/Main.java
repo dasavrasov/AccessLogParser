@@ -1,5 +1,6 @@
 import java.io.*;
-import java.time.*;
+import java.util.HashSet;
+import java.util.Map;
 
 public class Main {
     public static void main(String[] args) {
@@ -48,6 +49,16 @@ public class Main {
             System.out.println("Cреднее количество посещений сайта за час:\n"+stats.averageNumberVisits());
             System.out.println("Cреднее количество ошибочных запросов в час:\n"+stats.avarageNumberOfBadRequests());
             System.out.println("Cредняя посещаемость одним пользователем:\n"+stats.averageUserActivity());
+            Map.Entry<Integer, Integer> peekEntry=stats.peekSecondActivity();
+            System.out.println("Максимальное количество посещений в секунду:\n"+peekEntry.getValue());
+            System.out.println("Номер секунды в которую было наибольшее количество посещений:\n"+peekEntry.getKey());
+            System.out.println("Список доменов:");
+            HashSet<String> domains=stats.getDomains();
+            domains.stream().filter(s->s!=null && !s.isEmpty()).forEach(System.out::println);
+
+            Map.Entry<String, Integer> peekUserEntry=stats.peekUserActivity();
+            System.out.println("Максимальное количество посещений одним пользователем:\n"+peekUserEntry.getValue());
+            System.out.println("Пользователь который совершил наибольшее количество посещений:\n"+peekUserEntry.getKey());
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

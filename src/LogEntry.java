@@ -129,4 +129,19 @@ public class LogEntry {
     public String getReferer() {
         return referer;
     }
+
+    public String getDomain(){
+        int i;
+        String str=null;
+        i=referer.indexOf("://");
+        if (i>0) {
+            str=referer.substring(i+3);
+            i=str.indexOf('/');
+            if (i>0)
+                str=str.substring(0,i);
+        } else
+            return null;
+
+        return str;
+    }
 }

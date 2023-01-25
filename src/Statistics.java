@@ -1,6 +1,5 @@
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.*;
 
 public class Statistics {
@@ -8,6 +7,13 @@ public class Statistics {
     private LocalDateTime minTime=LocalDateTime.MAX;
 
     private LocalDateTime maxTime=LocalDateTime.MIN;
+
+
+    private HashSet<String> domains=new HashSet<>();
+
+    private HashMap<Integer, Integer> activities=new HashMap<>();
+
+    private HashMap<String, Integer> userVisits=new HashMap<>();
 
     public long getHours(){
         return Duration.between(minTime,maxTime).toHours();
@@ -34,6 +40,10 @@ public class Statistics {
         SysInfo sysInfo;
         BrowserInfo browserInfo;
         int responseCode=0;
+        int sec=0;
+        int visitsPerSec=0;
+        int visitsPerUser=0;
+        String user;
 
         lines.add(logEntry);
 
@@ -62,6 +72,25 @@ public class Statistics {
         else
             browserStats.put(browserInfo.name(),browserStats.get(browserInfo.name())+1);
 
+        if (!logEntry.getUserAgent().isBot()) { //если не Бот
+            sec=logEntry.getDateRec().getSecond();
+            if (activities.containsKey(sec)) {
+                visitsPerSec = activities.get(sec);
+                activities.put(sec, ++visitsPerSec);
+            } else {
+                activities.put(sec, 1);
+            }
+
+            user=logEntry.getAddress();
+            if (userVisits.containsKey(user)) {
+                visitsPerUser = userVisits.get(user);
+                userVisits.put(user, ++visitsPerUser);
+            } else {
+                userVisits.put(user, 1);
+            }
+        }
+
+        domains.add(logEntry.getDomain());
     }
 
     public double getTrafficRate(){
@@ -153,4 +182,20 @@ public class Statistics {
         return visits/numberUniqIp;
     }
 
+    //Метод расчёта пиковой посещаемости сайта (в секунду)
+    public Map.Entry<Integer, Integer> peekSecondActivity(){
+        Map.Entry<Integer, Integer> result=activities.entrySet().stream().max((e1,e2)->e1.getValue().compareTo(e2.getValue())).get();
+        return result;
+    }
+
+    //список сайтов, со страниц которых есть ссылки на текущий сайт
+    public HashSet<String> getDomains() {
+        return domains;
+    }
+
+    //Метод расчёта максимальной посещаемости одним пользователем
+    public Map.Entry<String, Integer> peekUserActivity(){
+        Map.Entry<String, Integer> result=userVisits.entrySet().stream().max((e1,e2)->e1.getValue().compareTo(e2.getValue())).get();
+        return result;
+    }
 }
